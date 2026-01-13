@@ -34,7 +34,6 @@
             overflow-x: hidden; 
         }
 
-        /* HEADER FIXO REESTRUTURADO */
         .main-header {
             position: fixed;
             top: 0;
@@ -88,7 +87,6 @@
         }
         .theme-toggle:hover { background: rgba(0,0,0,0.05); transform: rotate(30deg); }
 
-        /* MENU LATERAL */
         .side-menu { 
             position: fixed; 
             top: 0; 
@@ -116,17 +114,41 @@
         .sugestoes { position: absolute; top: 100%; left: 0; width: calc(100% - 110px); background: var(--bg-card); border-radius: 0 0 15px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 1000; border: 1px solid #ddd; border-top: none; }
         .sugestao-item { padding: 10px 20px; cursor: pointer; text-transform: capitalize; }
         .sugestao-item:hover { background: var(--type-color); color: white; }
+        
         .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; width: 420px; max-width: 95vw; border-top: 10px solid var(--type-color); position: relative; transition: opacity 0.3s ease; }
         .card.loading { opacity: 0.3; }
+        
         .btn-cry { background: var(--type-color); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8em; transition: 0.2s; }
         .logo-pokemon { width: 100%; max-width: 220px; margin-bottom: 20px; cursor: pointer; }
-        .abas-container { display: flex; margin-top: 15px; border-bottom: 2px solid #44444422; overflow-x: auto; scrollbar-width: none; }
-        .tab-btn { padding: 10px 15px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; flex-shrink: 0; }
+        
+        /* AJUSTE DAS ABAS */
+        .abas-container { display: flex; margin-top: 15px; border-bottom: 2px solid #44444422; position: relative; align-items: center; }
+        .abas-principais { display: flex; flex: 1; overflow: hidden; }
+        .tab-btn { padding: 12px 10px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; flex: 1; text-align: center; white-space: nowrap; transition: 0.2s; }
         .tab-btn.active { color: var(--type-color); border-bottom: 3px solid var(--type-color); }
+        
+        /* MENU DROPDOWN INTERNO */
+        .tab-more-container { position: relative; display: flex; align-items: center; }
+        .btn-more-tabs { background: none; border: none; font-size: 18px; color: var(--text-sub); cursor: pointer; padding: 10px; }
+        .tab-dropdown { position: absolute; top: 100%; right: 0; background: var(--bg-card); box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 10px; display: none; z-index: 1100; min-width: 140px; overflow: hidden; border: 1px solid #44444422; }
+        .tab-dropdown.open { display: block; }
+        .tab-dropdown button { width: 100%; padding: 12px 15px; text-align: left; background: none; border: none; color: var(--text-main); font-weight: bold; cursor: pointer; font-size: 0.8em; border-bottom: 1px solid #44444411; }
+        .tab-dropdown button:hover { background: var(--type-color); color: white; }
+
         .tab-content { display: none; padding: 15px 0; max-height: 320px; overflow-y: auto; text-align: left; }
         .tab-content.active { display: block; }
+        
         .item-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #44444411; font-size: 0.85em; align-items: center; }
         .ability-box { background: rgba(0,0,0,0.05); padding: 12px; border-radius: 12px; border-left: 5px solid var(--type-color); margin-bottom: 10px; }
+        
+        .evo-container { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .evo-step { background: rgba(0,0,0,0.03); padding: 10px; border-radius: 15px; width: 100%; display: flex; align-items: center; gap: 15px; border: 1px solid #44444411; }
+        .dark-mode .evo-step { background: rgba(255,255,255,0.05); }
+        .evo-img { width: 50px; height: 50px; cursor: pointer; transition: 0.2s; }
+        .evo-img:hover { transform: scale(1.1); }
+        .evo-info { font-size: 0.8em; flex: 1; }
+        .evo-arrow { font-size: 1.2em; color: var(--type-color); }
+
         .grid-pokemon { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; overflow-y: auto; padding: 10px; }
         .mini-card { background: var(--bg-card); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-transform: capitalize; }
         .mini-card img { width: 80px; height: 80px; }
@@ -167,15 +189,26 @@
             <p id="pkmTipos" style="font-weight: bold; margin-bottom: 5px;"></p>
             <button class="btn-cry" id="btnCry" onclick="playCry()"><span>🔊</span> Ouvir Choro</button>
             <div style="background: var(--bg-detalhes); border-radius: 20px; padding: 15px;">
+                
                 <div class="abas-container">
-                    <button class="tab-btn active" onclick="openTab('tabStats', this)">STATUS</button>
-                    <button class="tab-btn" onclick="openTab('tabAbil', this)">HABILIDADES</button>
-                    <button class="tab-btn" onclick="openTab('tabAtk', this)">ATAQUES</button>
-                    <button class="tab-btn" onclick="openTab('tabTM', this)">HM/TM</button>
+                    <div class="abas-principais">
+                        <button class="tab-btn active" onclick="openTab('tabStats', this)">STATUS</button>
+                        <button class="tab-btn" onclick="openTab('tabEvo', this)">EVOLUÇÃO</button>
+                        <button class="tab-btn" onclick="openTab('tabAtk', this)">ATAQUE</button>
+                    </div>
+                    <div class="tab-more-container">
+                        <button class="btn-more-tabs" onclick="toggleTabDropdown()" title="Mais abas">☰</button>
+                        <div class="tab-dropdown" id="tabDropdown">
+                            <button onclick="openTab('tabAbil', this)">HABILIDADES</button>
+                            <button onclick="openTab('tabTM', this)">HM / TM</button>
+                        </div>
+                    </div>
                 </div>
+
                 <div id="tabStats" class="tab-content active"></div>
-                <div id="tabAbil" class="tab-content"></div>
+                <div id="tabEvo" class="tab-content"></div>
                 <div id="tabAtk" class="tab-content"></div>
+                <div id="tabAbil" class="tab-content"></div>
                 <div id="tabTM" class="tab-content"></div>
             </div>
             <small style="color: var(--text-sub); display: block; margin-top: 15px;">Dica: Use as setas ← → ou deslize</small>
@@ -194,6 +227,7 @@
     <script>
         const colors = { fire: '#ff9c54', grass: '#63bb5b', water: '#4e90d5', bug: '#90c12c', normal: '#9099a1', poison: '#ab6ac8', electric: '#f3d23b', ground: '#d97746', fairy: '#ee99ac', fighting: '#ce4069', psychic: '#f97176', rock: '#c7b78b', ghost: '#5269ac', ice: '#74ced9', dragon: '#0a6af2', dark: '#5a5366', steel: '#5a8ea1', flying: '#8fa8dd' };
         const tiposTraduzidos = { fire: 'Fogo', grass: 'Planta', water: 'Água', bug: 'Inseto', normal: 'Normal', poison: 'Veneno', electric: 'Elétrico', ground: 'Terra', fairy: 'Fada', fighting: 'Lutador', psychic: 'Psíquico', rock: 'Pedra', ghost: 'Fantasma', ice: 'Gelo', dragon: 'Dragão', dark: 'Sombrio', steel: 'Aço', flying: 'Voador' };
+        
         let listaCompleta = [];
         let pkmAtualId = 1;
         let audioChoro = null;
@@ -238,20 +272,27 @@
             document.getElementById('sugestoes').style.display = 'none';
             const card = document.getElementById('mainCard');
             card.classList.add('loading');
+            
             try {
                 const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${query}`);
                 const d = await res.json();
                 pkmAtualId = d.id;
                 audioChoro = d.cries.latest || d.cries.legacy;
                 const mainType = d.types[0].type.name;
+                
                 document.documentElement.style.setProperty('--type-color', colors[mainType] || '#e3350d');
                 document.getElementById('logoIntro').style.display = 'none';
                 document.getElementById('areaResultado').style.display = 'block';
                 document.getElementById('pkmNome').innerText = `#${d.id} - ${d.name.toUpperCase()}`;
                 document.getElementById('pkmImg').src = d.sprites.other['official-artwork'].front_default;
+                
                 const tiposPT = d.types.map(t => tiposTraduzidos[t.type.name]?.toUpperCase() || t.type.name.toUpperCase());
                 document.getElementById('pkmTipos').innerText = tiposPT.join(' / ');
+                
                 document.getElementById('tabStats').innerHTML = d.stats.map(s => `<div style="display:flex; align-items:center; margin-bottom:10px; font-size:0.85em"><span style="width:90px; font-weight:bold">${s.stat.name.toUpperCase()}</span><div style="flex:1; background:#ddd; height:8px; border-radius:4px; margin:0 10px; overflow:hidden"><div style="width:${(s.base_stat/255)*100}%; background:var(--type-color); height:100%"></div></div><span>${s.base_stat}</span></div>`).join('');
+                
+                carregarEvolucoes(d.species.url);
+
                 document.getElementById('tabAbil').innerHTML = "Carregando...";
                 const abilHTML = await Promise.all(d.abilities.map(async a => {
                     const rAb = await fetch(a.ability.url);
@@ -261,8 +302,10 @@
                     return `<div class="ability-box"><strong style="color:var(--type-color)">${a.ability.name.toUpperCase()}</strong><div>${ptDesc}</div></div>`;
                 }));
                 document.getElementById('tabAbil').innerHTML = abilHTML.join('');
+
                 const lvAtks = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'level-up').sort((a,b) => a.version_group_details[0].level_learned_at - b.version_group_details[0].level_learned_at);
                 document.getElementById('tabAtk').innerHTML = lvAtks.map(m => `<div class="item-row"><span>${m.move.name.toUpperCase()}</span><span style="color:var(--type-color)">Lv ${m.version_group_details[0].level_learned_at}</span></div>`).join('');
+                
                 const machineMoves = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'machine');
                 const tmsRaw = await Promise.all(machineMoves.map(async m => {
                     const rM = await fetch(m.move.url); const dM = await rM.json();
@@ -277,16 +320,66 @@
                 tmsRaw.filter(x => x).forEach(item => { if(!labelsUsed.has(item.label)) { labelsUsed.add(item.label); uniqueTMs.push(item); } });
                 const hms = uniqueTMs.filter(x => x.label.startsWith('HM')).sort((a,b) => a.num - b.num);
                 const tms = uniqueTMs.filter(x => x.label.startsWith('TM')).sort((a,b) => a.num - b.num);
-                let tmHTML = `<div class="section-title">HM:</div>` + (hms.length ? hms.map(h => `<div class="item-row"><span>${h.label} - ${h.name}</span><span>💿</span></div>`).join('') : "Nenhuma");
-                tmHTML += `<div class="section-title">TM:</div>` + (tms.length ? tms.map(t => `<div class="item-row"><span>${t.label} - ${t.name}</span><span>💿</span></div>`).join('') : "Nenhuma");
+                let tmHTML = `<div style="font-weight:bold; margin: 10px 0; color: var(--type-color)">HM:</div>` + (hms.length ? hms.map(h => `<div class="item-row"><span>${h.label} - ${h.name}</span><span>💿</span></div>`).join('') : "Nenhuma");
+                tmHTML += `<div style="font-weight:bold; margin: 10px 0; color: var(--type-color)">TM:</div>` + (tms.length ? tms.map(t => `<div class="item-row"><span>${t.label} - ${t.name}</span><span>💿</span></div>`).join('') : "Nenhuma");
                 document.getElementById('tabTM').innerHTML = tmHTML;
+
             } catch(e) { console.error(e); }
             setTimeout(() => card.classList.remove('loading'), 100);
         }
 
+        async function carregarEvolucoes(speciesUrl) {
+            const tabEvo = document.getElementById('tabEvo');
+            tabEvo.innerHTML = "Carregando evolução...";
+            try {
+                const resSp = await fetch(speciesUrl);
+                const dataSp = await resSp.json();
+                const resEv = await fetch(dataSp.evolution_chain.url);
+                const dataEv = await resEv.json();
+                let html = '<div class="evo-container">';
+                let current = dataEv.chain;
+                while (current) {
+                    const pkmName = current.species.name;
+                    const pkmId = current.species.url.split('/').filter(Boolean).pop();
+                    const imgUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pkmId}.png`;
+                    let detalhes = "";
+                    if (current.evolution_details && current.evolution_details.length > 0) {
+                        const det = current.evolution_details[0];
+                        if (det.min_level) detalhes = `Nível ${det.min_level}`;
+                        else if (det.item) detalhes = `Usar ${det.item.name.replace(/-/g, ' ')}`;
+                        else if (det.trigger.name === 'trade') detalhes = `Troca`;
+                        else if (det.min_happiness) detalhes = `Felicidade`;
+                        else detalhes = det.trigger.name.replace(/-/g, ' ');
+                    }
+                    html += `<div class="evo-step"><img src="${imgUrl}" class="evo-img" onclick="buscar('${pkmName}')"><div class="evo-info"><b style="text-transform: capitalize;">${pkmName}</b><br><span style="color: var(--text-sub)">${detalhes}</span></div>${current.evolves_to.length > 0 ? '<span class="evo-arrow">➜</span>' : ''}</div>`;
+                    current = current.evolves_to[0];
+                }
+                html += '</div>';
+                tabEvo.innerHTML = html;
+            } catch (e) { tabEvo.innerHTML = "Informação de evolução indisponível."; }
+        }
+
+        // FUNÇÕES DE UI
+        function toggleTabDropdown() { document.getElementById('tabDropdown').classList.toggle('open'); }
+        
+        function openTab(id, btn) { 
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); 
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+            document.getElementById(id).classList.add('active'); 
+            
+            // Se o botão clicado for um das abas principais
+            if(btn.classList.contains('tab-btn')) {
+                btn.classList.add('active');
+            } else {
+                // Se veio do dropdown, remove o active de todos os principais
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            }
+            // Fecha o dropdown se estiver aberto
+            document.getElementById('tabDropdown').classList.remove('open');
+        }
+
         function playCry() { if (audioChoro) { const audio = new Audio(audioChoro); audio.volume = 0.5; audio.play(); } }
         function toggleMenu() { const menu = document.getElementById('sideMenu'); const overlay = document.getElementById('menuOverlay'); menu.classList.toggle('open'); overlay.style.display = menu.classList.contains('open') ? 'block' : 'none'; }
-        function openTab(id, btn) { document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
         function abrirLista() { document.getElementById('modalLista').style.display = 'flex'; const g = document.getElementById('gridPkm'); if(!g.innerHTML) g.innerHTML = listaCompleta.map((n, i) => `<div class="mini-card" onclick="selPkm('${n}')"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png" loading="lazy"><span class="pkm-id">#${i+1}</span><span class="pkm-name">${n}</span></div>`).join(''); }
         function selPkm(n) { buscar(n); fecharLista(); }
         function fecharLista() { document.getElementById('modalLista').style.display = 'none'; }
@@ -294,40 +387,23 @@
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
         function filtrarLista(v) { document.querySelectorAll('.mini-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(v.toLowerCase()) ? 'flex' : 'none'); }
 
-        // --- FUNÇÕES DE NAVEGAÇÃO READICIONADAS ---
-        
-        // Controle por Teclado (PC)
+        // Navegação
         document.addEventListener('keydown', (e) => {
-            // Se o usuário estiver digitando no campo de busca, não muda de pokemon
             if (document.activeElement.tagName === 'INPUT') return;
-            
             if (e.key === 'ArrowRight') buscar(pkmAtualId + 1);
             if (e.key === 'ArrowLeft' && pkmAtualId > 1) buscar(pkmAtualId - 1);
         });
 
-        // Controle por Deslize (Mobile)
-        let touchstartX = 0;
-        let touchendX = 0;
-        const mainCard = document.getElementById('mainCard');
-
-        mainCard.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX;
-        }, false);
-
-        mainCard.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            handleGesture();
-        }, false);
-
-        function handleGesture() {
-            const threshold = 70; // Sensibilidade do deslize
-            if (touchendX < touchstartX - threshold) {
-                // Deslizou para a esquerda -> Próximo
-                buscar(pkmAtualId + 1);
-            }
-            if (touchendX > touchstartX + threshold) {
-                // Deslizou para a direita -> Anterior
-                if (pkmAtualId > 1) buscar(pkmAtualId - 1);
+        // Clique fora do dropdown para fechar
+        window.onclick = function(event) {
+            if (!event.target.matches('.btn-more-tabs')) {
+                var dropdowns = document.getElementsByClassName("tab-dropdown");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('open')) {
+                        openDropdown.classList.remove('open');
+                    }
+                }
             }
         }
     </script>
