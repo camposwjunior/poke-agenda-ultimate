@@ -15,56 +15,87 @@
             --text-sub: #bbb; --bg-detalhes: rgba(40, 40, 40, 0.7); --btn-choro: #555;
         }
 
+        * { box-sizing: border-box; } /* Impede que padding/border aumentem o tamanho real dos elementos */
+
         body { 
             font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; 
             background: var(--bg-body); color: var(--text-main); padding: 20px; transition: all 0.3s ease; 
+            min-height: 100vh; margin: 0;
         }
 
-        .btn-theme { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; background: none; border: none; z-index: 10; }
+        .btn-theme { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; background: none; border: none; z-index: 1010; }
         .logo-pokemon { width: 100%; max-width: 250px; margin-bottom: 20px; cursor: pointer; }
         
-        .busca-container { margin-bottom: 15px; position: relative; display: flex; gap: 10px; width: 100%; max-width: 450px; justify-content: center; align-items: center; }
-        input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; width: 100%; outline: none; background: var(--bg-card); color: var(--text-main); }
+        /* CORREÇÃO DA BARRA DE BUSCA */
+        .busca-container { 
+            margin-bottom: 15px; 
+            position: relative; 
+            display: flex; 
+            gap: 10px; 
+            width: 100%; 
+            max-width: 500px; /* Aumentado levemente para caber os 3 elementos */
+            justify-content: center; 
+            align-items: center;
+            padding: 0 10px;
+        }
         
-        .btn-home { background: #333; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .btn-home:hover { background: #e3350d; transform: scale(1.1); }
+        input { 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            border: 2px solid #ccc; 
+            flex: 1; /* Faz o input ocupar o espaço restante sem vazar */
+            min-width: 0; /* Correção para flexbox não bugar largura */
+            outline: none; 
+            background: var(--bg-card); 
+            color: var(--text-main); 
+        }
+        
+        .btn-home, #btnBuscar, .btn-lista { 
+            background: #333; color: white; border: none; border-radius: 25px; 
+            padding: 10px 20px; cursor: pointer; font-weight: bold; transition: 0.2s; 
+            white-space: nowrap; /* Impede o texto do botão de quebrar */
+        }
+        
+        .btn-home { border-radius: 50%; width: 45px; height: 45px; padding: 0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .btn-home:hover, #btnBuscar:hover, .btn-lista:hover { background: #e3350d; transform: scale(1.05); }
 
         #sugestoes {
-            position: absolute; top: 50px; left: 55px; width: 260px; background: var(--bg-card);
+            position: absolute; top: 55px; left: 65px; right: 105px; /* Alinhado com o input */
+            background: var(--bg-card);
             border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100;
             max-height: 200px; overflow-y: auto; display: none; text-align: left;
         }
-        .sugestao-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #44444422; font-size: 0.9em; font-weight: bold; }
-        .sugestao-item:hover { background: #e3350d; color: white; }
 
-        .filtros-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin-bottom: 25px; }
+        /* FILTROS E MODAL */
+        .filtros-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin-bottom: 15px; }
         .btn-filtro { padding: 8px 12px; border-radius: 15px; border: 1px solid #ccc; background: var(--bg-card); color: var(--text-main); cursor: pointer; font-size: 0.8em; font-weight: bold; transition: 0.2s; }
         .btn-filtro:hover { background: #e3350d; color: white; }
 
-        .navegacao-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; max-width: 900px; }
-        .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 420px; position: relative; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--bg-body); color: var(--text-main); width: 90%; max-width: 900px; height: 85vh; border-radius: 25px; padding: 25px; position: relative; display: flex; flex-direction: column; }
+        .close-modal { position: absolute; top: 15px; right: 25px; font-size: 35px; cursor: pointer; color: #e3350d; }
+        .grid-pokemon { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; overflow-y: auto; padding: 10px; margin-top: 10px; }
+        .mini-card { background: var(--bg-card); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 2px solid transparent; }
+        .mini-card:hover { transform: translateY(-5px); border-color: #e3350d; }
+        .mini-card img { width: 70px; height: 70px; }
 
-        .btn-shiny { position: absolute; top: 120px; right: 50px; background: #ffe066; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px; z-index: 5; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        /* CARD DE RESULTADO */
+        .navegacao-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; max-width: 900px; margin-top: 10px; }
+        .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 420px; position: relative; }
+        .btn-shiny { position: absolute; top: 120px; right: 50px; background: #ffe066; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px; z-index: 5; }
 
         .abas-container { display: flex; margin-top: 15px; gap: 5px; border-bottom: 2px solid #44444422; }
-        .tab-btn { flex: 1; padding: 10px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; transition: 0.3s; }
+        .tab-btn { flex: 1; padding: 10px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; }
         .tab-btn.active { color: #e3350d; border-bottom: 3px solid #e3350d; }
 
-        .tab-content { display: none; padding: 15px 0; max-height: 350px; overflow-y: auto; text-align: left; }
+        .tab-content { display: none; padding: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .tab-content.active { display: block; }
-
-        .stat-row { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.75em; font-weight: bold; }
-        .stat-label { width: 70px; color: var(--text-sub); }
+        .stat-row { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.75em; }
         .stat-bar-bg { flex-grow: 1; background: #ddd; height: 8px; border-radius: 4px; overflow: hidden; margin: 0 10px; }
         .stat-bar-fill { height: 100%; transition: width 0.8s ease; }
-
         .move-row { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #44444411; font-size: 0.8em; }
-        .move-lvl { color: #e3350d; font-weight: bold; }
-        .move-section-title { color: #e3350d; font-size: 0.9em; margin: 15px 0 8px 0; border-left: 4px solid #e3350d; padding-left: 8px; }
-
-        .btn-nav { background: #333; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; transition: 0.2s; }
-        .btn-nav:hover { background: #e3350d; }
-        .btn-choro { background: var(--btn-choro); color: white; border: none; border-radius: 12px; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin: 10px 0; font-size: 0.85em; }
+        .btn-nav { background: #333; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; }
+        .btn-choro { background: var(--btn-choro); color: white; border: none; border-radius: 12px; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -73,20 +104,30 @@
     <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pokémon_logo.svg" class="logo-pokemon" id="logoIntro" onclick="voltarInicio()">
 
     <div class="busca-container">
-        <button class="btn-home" onclick="voltarInicio()" title="Voltar ao início">🏠</button>
+        <button class="btn-home" onclick="voltarInicio()">🏠</button>
         <input type="text" id="pokemonInput" placeholder="Nome ou número..." oninput="autoComplete(this.value)">
         <div id="sugestoes"></div>
         <button id="btnBuscar" onclick="buscar()">Buscar</button>
     </div>
 
     <div class="filtros-wrapper" id="filtros"></div>
+    <button class="btn-lista" style="margin-bottom: 20px;" onclick="abrirLista()">📋 Lista Completa (Pokedex)</button>
+
+    <div id="modalLista" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="fecharLista()">&times;</span>
+            <h2 style="text-align:center; margin-bottom:10px;">Pokédex Nacional</h2>
+            <input type="text" id="filtroLista" placeholder="Pesquisar na lista..." oninput="filtrarListaLocal(this.value)">
+            <div id="gridPokemon" class="grid-pokemon"></div>
+        </div>
+    </div>
 
     <div class="navegacao-wrapper" id="areaResultado" style="display: none;">
         <button class="btn-nav" onclick="navegar(-1)"> < </button>
         <div id="resultado" class="card">
-            <h2 id="pkmNome" style="margin-bottom: 5px;"></h2>
-            <button class="btn-shiny" onclick="toggleShiny()" title="Ver versão Shiny">✨</button>
-            <img id="pkmImagem" style="width: 180px; height: 180px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));">
+            <h2 id="pkmNome"></h2>
+            <button class="btn-shiny" onclick="toggleShiny()">✨</button>
+            <img id="pkmImagem" style="width:180px; height:180px;">
             <div style="background: var(--bg-detalhes); border-radius: 20px; padding: 15px; margin-top: 10px;">
                 <div style="font-size: 0.9em; margin-bottom: 10px;">
                     <strong>Tipo:</strong> <span id="pkmTipo"></span><br>
@@ -97,10 +138,7 @@
                     <button class="tab-btn" onclick="openTab('tabMoves', this)">ATAQUES</button>
                     <button class="tab-btn" onclick="openTab('tabTMs', this)">TMs / HMs</button>
                 </div>
-                <div id="tabSobre" class="tab-content active">
-                    <div id="statsContainer"></div>
-                    <p id="pkmDescricao" style="font-style: italic; font-size: 0.9em; margin-top: 12px; line-height: 1.4;"></p>
-                </div>
+                <div id="tabSobre" class="tab-content active"><div id="statsContainer"></div><p id="pkmDescricao" style="font-style:italic; font-size:0.9em; margin-top:10px;"></p></div>
                 <div id="tabMoves" class="tab-content"><div id="movesList"></div></div>
                 <div id="tabTMs" class="tab-content"><div id="tmList"></div></div>
             </div>
@@ -114,37 +152,49 @@
         const traduzirStat = { 'hp': 'HP', 'attack': 'ATQ', 'defense': 'DEF', 'special-attack': 'S.ATQ', 'special-defense': 'S.DEF', 'speed': 'VEL' };
         const hmsValidas = ["surf", "fly", "strength", "flash", "waterfall", "cut", "whirlpool", "rock-smash", "dive"];
 
-        let idAtual = 0, imgNormal = "", imgShiny = "", mostrandoShiny = false, listaNomes = [];
+        let idAtual = 0, imgNormal = "", imgShiny = "", listaNomes = [];
 
         function voltarInicio() {
-            idAtual = 0;
-            document.getElementById('pokemonInput').value = '';
-            document.getElementById('sugestoes').style.display = 'none';
             document.getElementById('areaResultado').style.display = 'none';
             document.getElementById('logoIntro').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('pokemonInput').value = '';
         }
 
         async function carregarLista() {
-            try {
-                const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-                const dados = await res.json();
-                listaNomes = dados.results.map(p => p.name);
-                const geracoes = [{n: "1ª", id: 1}, {n: "2ª", id: 152}, {n: "3ª", id: 252}, {n: "4ª", id: 387}, {n: "5ª", id: 494}, {n: "6ª", id: 650}, {n: "7ª", id: 722}, {n: "8ª", id: 810}, {n: "9ª", id: 906}];
-                const divF = document.getElementById('filtros');
-                geracoes.forEach(g => { divF.innerHTML += `<button class="btn-filtro" onclick="filtrar(${g.id})">${g.n} Gen</button>`; });
-            } catch (e) { console.error("Erro ao carregar", e); }
+            const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+            const dados = await res.json();
+            listaNomes = dados.results.map(p => p.name);
+            const geracoes = [{n: "1ª", id: 1}, {n: "2ª", id: 152}, {n: "3ª", id: 252}, {n: "4ª", id: 387}, {n: "5ª", id: 494}, {n: "6ª", id: 650}, {n: "7ª", id: 722}, {n: "8ª", id: 810}, {n: "9ª", id: 906}];
+            const divF = document.getElementById('filtros');
+            divF.innerHTML = "";
+            geracoes.forEach(g => { divF.innerHTML += `<button class="btn-filtro" onclick="filtrar(${g.id})">${g.n} Gen</button>`; });
         }
         carregarLista();
 
-        function autoComplete(valor) {
-            const listaDiv = document.getElementById('sugestoes');
-            if (!valor || valor.length < 2) { listaDiv.style.display = 'none'; return; }
-            const filtro = listaNomes.filter(n => n.includes(valor.toLowerCase())).slice(0, 6);
-            if (filtro.length > 0) {
-                listaDiv.innerHTML = filtro.map(n => `<div class="sugestao-item" onclick="filtrar('${n}')">${n.toUpperCase()}</div>`).join('');
-                listaDiv.style.display = 'block';
-            } else { listaDiv.style.display = 'none'; }
+        function abrirLista() {
+            document.getElementById('modalLista').style.display = 'flex';
+            const grid = document.getElementById('gridPokemon');
+            if(grid.innerHTML === "") {
+                grid.innerHTML = listaNomes.map((nome, i) => `
+                    <div class="mini-card" onclick="selecionarDaLista('${nome}')">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png" loading="lazy">
+                        <span>#${i+1} ${nome.toUpperCase()}</span>
+                    </div>`).join('');
+            }
+        }
+        function fecharLista() { document.getElementById('modalLista').style.display = 'none'; }
+        function selecionarDaLista(n) { filtrar(n); fecharLista(); }
+        function filtrarListaLocal(v) {
+            const cards = document.querySelectorAll('.mini-card');
+            cards.forEach(c => c.style.display = c.innerText.toLowerCase().includes(v.toLowerCase()) ? "block" : "none");
+        }
+
+        function autoComplete(v) {
+            const d = document.getElementById('sugestoes');
+            if (!v || v.length < 2) { d.style.display = 'none'; return; }
+            const f = listaNomes.filter(n => n.includes(v.toLowerCase())).slice(0, 6);
+            d.innerHTML = f.map(n => `<div class="sugestao-item" onclick="filtrar('${n}')">${n.toUpperCase()}</div>`).join('');
+            d.style.display = f.length ? 'block' : 'none';
         }
 
         function openTab(tabId, btn) {
@@ -155,69 +205,49 @@
         }
 
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-        function toggleShiny() { mostrandoShiny = !mostrandoShiny; document.getElementById('pkmImagem').src = mostrandoShiny ? imgShiny : imgNormal; }
+        function toggleShiny() { document.getElementById('pkmImagem').src = document.getElementById('pkmImagem').src === imgNormal ? imgShiny : imgNormal; }
         function filtrar(v) { document.getElementById('pokemonInput').value = v; document.getElementById('sugestoes').style.display = 'none'; buscar(); }
-        function navegar(dir) { const nid = idAtual + dir; if (nid > 0) filtrar(nid); }
+        function navegar(dir) { if (idAtual + dir > 0) filtrar(idAtual + dir); }
 
         async function buscar() {
-            const btnBusca = document.getElementById('btnBuscar');
-            const valor = document.getElementById('pokemonInput').value.toLowerCase().trim();
-            if (!valor) return;
-            btnBusca.innerText = "...";
-
+            const v = document.getElementById('pokemonInput').value.toLowerCase().trim();
+            if (!v) return;
             try {
-                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${valor}`);
-                const dados = await res.json();
-                idAtual = dados.id;
-                mostrandoShiny = false;
-                imgNormal = dados.sprites.other['official-artwork'].front_default;
-                imgShiny = dados.sprites.other['official-artwork'].front_shiny || imgNormal;
-
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${v}`);
+                const d = await res.json();
+                idAtual = d.id;
+                imgNormal = d.sprites.other['official-artwork'].front_default;
+                imgShiny = d.sprites.other['official-artwork'].front_shiny || imgNormal;
                 document.getElementById('logoIntro').style.display = 'none';
                 document.getElementById('areaResultado').style.display = 'flex';
-                document.getElementById('pkmNome').innerText = `#${dados.id} - ${dados.name.toUpperCase()}`;
+                document.getElementById('pkmNome').innerText = `#${d.id} - ${d.name.toUpperCase()}`;
                 document.getElementById('pkmImagem').src = imgNormal;
-                document.getElementById('pkmTipo').innerText = dados.types.map(t => traduzirTipo[t.type.name] || t.type.name).join(' / ');
-                document.getElementById('botaoAudio').onclick = () => { new Audio(dados.cries.latest).play(); };
-
-                const cor = coresTipos[dados.types[0].type.name] || "#ccc";
+                document.getElementById('pkmTipo').innerText = d.types.map(t => traduzirTipo[t.type.name] || t.type.name).join(' / ');
+                document.getElementById('botaoAudio').onclick = () => { new Audio(d.cries.latest).play(); };
+                
+                const cor = coresTipos[d.types[0].type.name] || "#ccc";
                 document.getElementById('resultado').style.backgroundColor = document.body.classList.contains('dark-mode') ? cor + "44" : cor + "22";
 
                 const statsC = document.getElementById('statsContainer'); statsC.innerHTML = '';
-                dados.stats.forEach(s => {
-                    const v = s.base_stat;
-                    const c = v > 100 ? '#2ecc71' : (v > 60 ? '#f1c40f' : '#e74c3c');
-                    statsC.innerHTML += `<div class="stat-row"><span class="stat-label">${traduzirStat[s.stat.name]}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(v/255)*100}%; background: ${c}"></div></div><span>${v}</span></div>`;
+                d.stats.forEach(s => {
+                    const val = s.base_stat;
+                    const c = val > 100 ? '#2ecc71' : (val > 60 ? '#f1c40f' : '#e74c3c');
+                    statsC.innerHTML += `<div class="stat-row"><span style="width:70px">${traduzirStat[s.stat.name]}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(val/255)*100}%; background: ${c}"></div></div><span>${val}</span></div>`;
                 });
 
-                const resS = await fetch(dados.species.url);
+                const resS = await fetch(d.species.url);
                 const dS = await resS.json();
                 let txt = (dS.flavor_text_entries.find(e => e.language.name === 'en') || dS.flavor_text_entries[0]).flavor_text.replace(/[\f\n\r]/g, ' ');
                 const resTr = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(txt)}&langpair=en|pt-br`);
                 const dTr = await resTr.json();
                 document.getElementById('pkmDescricao').innerText = dTr.responseData.translatedText;
 
-                document.getElementById('movesList').innerHTML = dados.moves
-                    .filter(m => m.version_group_details[0].move_learn_method.name === 'level-up')
-                    .sort((a,b) => a.version_group_details[0].level_learned_at - b.version_group_details[0].level_learned_at)
-                    .map(m => `<div class="move-row"><span>${m.move.name.toUpperCase().replace('-',' ')}</span><span class="move-lvl">Lv ${m.version_group_details[0].level_learned_at}</span></div>`)
-                    .join('');
-
-                const machines = dados.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'machine');
+                document.getElementById('movesList').innerHTML = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'level-up').sort((a,b) => a.version_group_details[0].level_learned_at - b.version_group_details[0].level_learned_at).map(m => `<div class="move-row"><span>${m.move.name.toUpperCase()}</span><span>Lv ${m.version_group_details[0].level_learned_at}</span></div>`).join('');
+                const machines = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'machine');
                 let hms = [], tms = [];
-                machines.forEach(m => {
-                    const n = m.move.name;
-                    hmsValidas.includes(n) ? hms.push(n.toUpperCase().replace('-',' ')) : tms.push(n.toUpperCase().replace('-',' '));
-                });
-
-                let htmlTM = `<div class="move-section-title">HMs (Técnicas de Campo)</div>`;
-                htmlTM += hms.length ? hms.map(h => `<div class="move-row"><span>${h}</span><span>💿</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Não aprende HMs.</p>`;
-                htmlTM += `<div class="move-section-title">TMs (Discos de Ataque)</div>`;
-                htmlTM += tms.length ? tms.map(t => `<div class="move-row"><span>${t}</span><span>💿</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Nenhuma TM encontrada.</p>`;
-                document.getElementById('tmList').innerHTML = htmlTM;
-
-            } catch (e) { alert("Erro ao buscar."); }
-            finally { btnBusca.innerText = "Buscar"; }
+                machines.forEach(m => { hmsValidas.includes(m.move.name) ? hms.push(m.move.name.toUpperCase()) : tms.push(m.move.name.toUpperCase()); });
+                document.getElementById('tmList').innerHTML = `<div style="color:#e3350d; font-weight:bold; margin-bottom:5px">HMs</div>` + (hms.map(h => `<div class="move-row">${h} 💿</div>`).join('') || 'Nenhuma') + `<div style="color:#e3350d; font-weight:bold; margin-top:10px; margin-bottom:5px">TMs</div>` + tms.map(t => `<div class="move-row">${t} 💿</div>`).join('');
+            } catch (e) { alert("Pokémon não encontrado!"); }
         }
     </script>
 </body>
