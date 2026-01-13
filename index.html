@@ -8,14 +8,16 @@
         :root {
             --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333;
             --text-sub: #666; --bg-detalhes: rgba(255, 255, 255, 0.85); --btn-choro: #333;
+            --menu-bg: #ffffff;
         }
 
         .dark-mode {
             --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #f0f0f0;
             --text-sub: #bbb; --bg-detalhes: rgba(40, 40, 40, 0.7); --btn-choro: #555;
+            --menu-bg: #252525;
         }
 
-        * { box-sizing: border-box; } /* Impede que padding/border aumentem o tamanho real dos elementos */
+        * { box-sizing: border-box; }
 
         body { 
             font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; 
@@ -23,71 +25,78 @@
             min-height: 100vh; margin: 0;
         }
 
-        .btn-theme { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; background: none; border: none; z-index: 1010; }
+        /* MENU HAMBURGUER */
+        .menu-icon {
+            position: absolute; top: 20px; left: 20px; font-size: 30px; cursor: pointer;
+            z-index: 1050; transition: 0.3s; color: var(--text-main);
+        }
+
+        .side-menu {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: var(--menu-bg); z-index: 1100; transition: 0.4s ease;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3); padding: 60px 20px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .side-menu.open { left: 0; }
+
+        .menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; z-index: 1080;
+        }
+
+        .menu-item {
+            padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+            color: var(--text-main); border: 1px solid transparent;
+        }
+
+        .menu-item:hover { background: #e3350d; color: white; }
+
+        /* BUSCA E LOGO */
         .logo-pokemon { width: 100%; max-width: 250px; margin-bottom: 20px; cursor: pointer; }
         
-        /* CORREÇÃO DA BARRA DE BUSCA */
         .busca-container { 
-            margin-bottom: 15px; 
-            position: relative; 
-            display: flex; 
-            gap: 10px; 
-            width: 100%; 
-            max-width: 500px; /* Aumentado levemente para caber os 3 elementos */
-            justify-content: center; 
-            align-items: center;
-            padding: 0 10px;
+            margin-bottom: 15px; position: relative; display: flex; gap: 10px; width: 100%; 
+            max-width: 500px; justify-content: center; align-items: center; padding: 0 10px;
         }
         
         input { 
-            padding: 12px 20px; 
-            border-radius: 25px; 
-            border: 2px solid #ccc; 
-            flex: 1; /* Faz o input ocupar o espaço restante sem vazar */
-            min-width: 0; /* Correção para flexbox não bugar largura */
-            outline: none; 
-            background: var(--bg-card); 
-            color: var(--text-main); 
+            padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; flex: 1; 
+            min-width: 0; outline: none; background: var(--bg-card); color: var(--text-main); 
         }
         
-        .btn-home, #btnBuscar, .btn-lista { 
+        #btnBuscar { 
             background: #333; color: white; border: none; border-radius: 25px; 
-            padding: 10px 20px; cursor: pointer; font-weight: bold; transition: 0.2s; 
-            white-space: nowrap; /* Impede o texto do botão de quebrar */
+            padding: 10px 25px; cursor: pointer; font-weight: bold; transition: 0.2s; 
         }
-        
-        .btn-home { border-radius: 50%; width: 45px; height: 45px; padding: 0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .btn-home:hover, #btnBuscar:hover, .btn-lista:hover { background: #e3350d; transform: scale(1.05); }
+        #btnBuscar:hover { background: #e3350d; }
 
         #sugestoes {
-            position: absolute; top: 55px; left: 65px; right: 105px; /* Alinhado com o input */
-            background: var(--bg-card);
-            border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100;
-            max-height: 200px; overflow-y: auto; display: none; text-align: left;
+            position: absolute; top: 55px; left: 10px; right: 120px;
+            background: var(--bg-card); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+            z-index: 100; max-height: 200px; overflow-y: auto; display: none; text-align: left;
         }
 
         /* FILTROS E MODAL */
-        .filtros-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin-bottom: 15px; }
+        .filtros-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin-bottom: 20px; }
         .btn-filtro { padding: 8px 12px; border-radius: 15px; border: 1px solid #ccc; background: var(--bg-card); color: var(--text-main); cursor: pointer; font-size: 0.8em; font-weight: bold; transition: 0.2s; }
         .btn-filtro:hover { background: #e3350d; color: white; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--bg-body); color: var(--text-main); width: 90%; max-width: 900px; height: 85vh; border-radius: 25px; padding: 25px; position: relative; display: flex; flex-direction: column; }
+        .modal-content { background: var(--bg-body); color: var(--text-main); width: 95%; max-width: 900px; height: 85vh; border-radius: 25px; padding: 25px; position: relative; display: flex; flex-direction: column; }
         .close-modal { position: absolute; top: 15px; right: 25px; font-size: 35px; cursor: pointer; color: #e3350d; }
         .grid-pokemon { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; overflow-y: auto; padding: 10px; margin-top: 10px; }
         .mini-card { background: var(--bg-card); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 2px solid transparent; }
         .mini-card:hover { transform: translateY(-5px); border-color: #e3350d; }
-        .mini-card img { width: 70px; height: 70px; }
 
-        /* CARD DE RESULTADO */
+        /* CARD */
         .navegacao-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; max-width: 900px; margin-top: 10px; }
         .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 420px; position: relative; }
         .btn-shiny { position: absolute; top: 120px; right: 50px; background: #ffe066; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px; z-index: 5; }
-
         .abas-container { display: flex; margin-top: 15px; gap: 5px; border-bottom: 2px solid #44444422; }
         .tab-btn { flex: 1; padding: 10px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; }
         .tab-btn.active { color: #e3350d; border-bottom: 3px solid #e3350d; }
-
         .tab-content { display: none; padding: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .tab-content.active { display: block; }
         .stat-row { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.75em; }
@@ -100,24 +109,29 @@
 </head>
 <body>
 
-    <button class="btn-theme" onclick="toggleTheme()">🌓</button>
+    <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-item" onclick="voltarInicio(); toggleMenu();">🏠 Início / Home</div>
+        <div class="menu-item" onclick="abrirLista(); toggleMenu();">📋 Lista Completa</div>
+        <div class="menu-item" onclick="toggleTheme()">🌓 Alternar Tema</div>
+    </div>
+
     <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pokémon_logo.svg" class="logo-pokemon" id="logoIntro" onclick="voltarInicio()">
 
     <div class="busca-container">
-        <button class="btn-home" onclick="voltarInicio()">🏠</button>
         <input type="text" id="pokemonInput" placeholder="Nome ou número..." oninput="autoComplete(this.value)">
         <div id="sugestoes"></div>
         <button id="btnBuscar" onclick="buscar()">Buscar</button>
     </div>
 
     <div class="filtros-wrapper" id="filtros"></div>
-    <button class="btn-lista" style="margin-bottom: 20px;" onclick="abrirLista()">📋 Lista Completa (Pokedex)</button>
 
     <div id="modalLista" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="fecharLista()">&times;</span>
             <h2 style="text-align:center; margin-bottom:10px;">Pokédex Nacional</h2>
-            <input type="text" id="filtroLista" placeholder="Pesquisar na lista..." oninput="filtrarListaLocal(this.value)">
+            <input type="text" id="filtroLista" placeholder="Pesquisar na lista..." oninput="filtrarListaLocal(this.value)" style="width: 100%;">
             <div id="gridPokemon" class="grid-pokemon"></div>
         </div>
     </div>
@@ -153,6 +167,13 @@
         const hmsValidas = ["surf", "fly", "strength", "flash", "waterfall", "cut", "whirlpool", "rock-smash", "dive"];
 
         let idAtual = 0, imgNormal = "", imgShiny = "", listaNomes = [];
+
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+            menu.classList.toggle('open');
+            overlay.style.display = menu.classList.contains('open') ? 'block' : 'none';
+        }
 
         function voltarInicio() {
             document.getElementById('areaResultado').style.display = 'none';
