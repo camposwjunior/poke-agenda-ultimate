@@ -23,9 +23,7 @@
         .btn-theme { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; background: none; border: none; z-index: 10; }
         .logo-pokemon { width: 100%; max-width: 250px; margin-bottom: 20px; cursor: pointer; }
         
-        /* BUSCA E AUTO-COMPLETE */
         .busca-container { margin-bottom: 15px; position: relative; display: flex; gap: 10px; width: 100%; max-width: 450px; justify-content: center; align-items: center; }
-        
         input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; width: 100%; outline: none; background: var(--bg-card); color: var(--text-main); }
         
         .btn-home { background: #333; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
@@ -72,12 +70,10 @@
 <body>
 
     <button class="btn-theme" onclick="toggleTheme()">🌓</button>
-    
     <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pokémon_logo.svg" class="logo-pokemon" id="logoIntro" onclick="voltarInicio()">
 
     <div class="busca-container">
         <button class="btn-home" onclick="voltarInicio()" title="Voltar ao início">🏠</button>
-        
         <input type="text" id="pokemonInput" placeholder="Nome ou número..." oninput="autoComplete(this.value)">
         <div id="sugestoes"></div>
         <button id="btnBuscar" onclick="buscar()">Buscar</button>
@@ -87,39 +83,28 @@
 
     <div class="navegacao-wrapper" id="areaResultado" style="display: none;">
         <button class="btn-nav" onclick="navegar(-1)"> < </button>
-        
         <div id="resultado" class="card">
             <h2 id="pkmNome" style="margin-bottom: 5px;"></h2>
             <button class="btn-shiny" onclick="toggleShiny()" title="Ver versão Shiny">✨</button>
             <img id="pkmImagem" style="width: 180px; height: 180px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));">
-            
             <div style="background: var(--bg-detalhes); border-radius: 20px; padding: 15px; margin-top: 10px;">
                 <div style="font-size: 0.9em; margin-bottom: 10px;">
                     <strong>Tipo:</strong> <span id="pkmTipo"></span><br>
                     <button class="btn-choro" id="botaoAudio">🔊 OUVIR CHORO</button>
                 </div>
-
                 <div class="abas-container">
                     <button class="tab-btn active" onclick="openTab('tabSobre', this)">STATUS</button>
                     <button class="tab-btn" onclick="openTab('tabMoves', this)">ATAQUES</button>
                     <button class="tab-btn" onclick="openTab('tabTMs', this)">TMs / HMs</button>
                 </div>
-
                 <div id="tabSobre" class="tab-content active">
                     <div id="statsContainer"></div>
                     <p id="pkmDescricao" style="font-style: italic; font-size: 0.9em; margin-top: 12px; line-height: 1.4;"></p>
                 </div>
-
-                <div id="tabMoves" class="tab-content">
-                    <div id="movesList"></div>
-                </div>
-
-                <div id="tabTMs" class="tab-content">
-                    <div id="tmList"></div>
-                </div>
+                <div id="tabMoves" class="tab-content"><div id="movesList"></div></div>
+                <div id="tabTMs" class="tab-content"><div id="tmList"></div></div>
             </div>
         </div>
-
         <button class="btn-nav" onclick="navegar(1)"> > </button>
     </div>
 
@@ -131,7 +116,6 @@
 
         let idAtual = 0, imgNormal = "", imgShiny = "", mostrandoShiny = false, listaNomes = [];
 
-        // FUNÇÃO DE VOLTAR AO INÍCIO
         function voltarInicio() {
             idAtual = 0;
             document.getElementById('pokemonInput').value = '';
@@ -146,15 +130,9 @@
                 const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
                 const dados = await res.json();
                 listaNomes = dados.results.map(p => p.name);
-                
-                const geracoes = [
-                    {n: "1ª", id: 1}, {n: "2ª", id: 152}, {n: "3ª", id: 252}, {n: "4ª", id: 387}, 
-                    {n: "5ª", id: 494}, {n: "6ª", id: 650}, {n: "7ª", id: 722}, {n: "8ª", id: 810}, {n: "9ª", id: 906}
-                ];
+                const geracoes = [{n: "1ª", id: 1}, {n: "2ª", id: 152}, {n: "3ª", id: 252}, {n: "4ª", id: 387}, {n: "5ª", id: 494}, {n: "6ª", id: 650}, {n: "7ª", id: 722}, {n: "8ª", id: 810}, {n: "9ª", id: 906}];
                 const divF = document.getElementById('filtros');
-                geracoes.forEach(g => {
-                    divF.innerHTML += `<button class="btn-filtro" onclick="filtrar(${g.id})">${g.n} Gen</button>`;
-                });
+                geracoes.forEach(g => { divF.innerHTML += `<button class="btn-filtro" onclick="filtrar(${g.id})">${g.n} Gen</button>`; });
             } catch (e) { console.error("Erro ao carregar", e); }
         }
         carregarLista();
@@ -232,10 +210,10 @@
                     hmsValidas.includes(n) ? hms.push(n.toUpperCase().replace('-',' ')) : tms.push(n.toUpperCase().replace('-',' '));
                 });
 
-                let htmlTM = `<div class="move-section-title">HMs (Campo)</div>`;
-                htmlTM += hms.length ? hms.map(h => `<div class="move-row"><span>${h}</span><span>🌊</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Nenhuma HM.</p>`;
-                htmlTM += `<div class="move-section-title">TMs (Ataque)</div>`;
-                htmlTM += tms.length ? tms.map(t => `<div class="move-row"><span>${t}</span><span>💿</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Nenhuma TM.</p>`;
+                let htmlTM = `<div class="move-section-title">HMs (Técnicas de Campo)</div>`;
+                htmlTM += hms.length ? hms.map(h => `<div class="move-row"><span>${h}</span><span>💿</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Não aprende HMs.</p>`;
+                htmlTM += `<div class="move-section-title">TMs (Discos de Ataque)</div>`;
+                htmlTM += tms.length ? tms.map(t => `<div class="move-row"><span>${t}</span><span>💿</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Nenhuma TM encontrada.</p>`;
                 document.getElementById('tmList').innerHTML = htmlTM;
 
             } catch (e) { alert("Erro ao buscar."); }
