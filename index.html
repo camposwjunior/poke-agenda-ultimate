@@ -45,14 +45,14 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 1000;
             display: flex;
-            justify-content: center; /* Centraliza o conteúdo interno */
+            justify-content: center; 
             padding: 0 20px;
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Espalha os elementos: esq, centro, dir */
+            justify-content: space-between; 
             width: 100%;
             max-width: 1200px;
         }
@@ -110,7 +110,6 @@
         .menu-item { padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; border-bottom: 1px solid #44444411; }
         .menu-item:hover { background: var(--type-color); color: white; }
 
-        /* RESTANTE DO CSS MANTIDO */
         .busca-container { position: relative; display: flex; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px; z-index: 100; }
         input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; flex: 1; background: var(--bg-card); color: var(--text-main); outline: none; font-size: 16px; }
         button#btnBuscar { background: #333; color: white; border: none; border-radius: 25px; padding: 10px 25px; cursor: pointer; font-weight: bold; }
@@ -179,6 +178,7 @@
                 <div id="tabAtk" class="tab-content"></div>
                 <div id="tabTM" class="tab-content"></div>
             </div>
+            <small style="color: var(--text-sub); display: block; margin-top: 15px;">Dica: Use as setas ← → ou deslize</small>
         </div>
     </div>
 
@@ -192,7 +192,6 @@
     </div>
 
     <script>
-        // Mantive todos os seus scripts originais aqui
         const colors = { fire: '#ff9c54', grass: '#63bb5b', water: '#4e90d5', bug: '#90c12c', normal: '#9099a1', poison: '#ab6ac8', electric: '#f3d23b', ground: '#d97746', fairy: '#ee99ac', fighting: '#ce4069', psychic: '#f97176', rock: '#c7b78b', ghost: '#5269ac', ice: '#74ced9', dragon: '#0a6af2', dark: '#5a5366', steel: '#5a8ea1', flying: '#8fa8dd' };
         const tiposTraduzidos = { fire: 'Fogo', grass: 'Planta', water: 'Água', bug: 'Inseto', normal: 'Normal', poison: 'Veneno', electric: 'Elétrico', ground: 'Terra', fairy: 'Fada', fighting: 'Lutador', psychic: 'Psíquico', rock: 'Pedra', ghost: 'Fantasma', ice: 'Gelo', dragon: 'Dragão', dark: 'Sombrio', steel: 'Aço', flying: 'Voador' };
         let listaCompleta = [];
@@ -294,6 +293,43 @@
         function voltarInicio() { document.getElementById('areaResultado').style.display='none'; document.getElementById('logoIntro').style.display='block'; }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
         function filtrarLista(v) { document.querySelectorAll('.mini-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(v.toLowerCase()) ? 'flex' : 'none'); }
+
+        // --- FUNÇÕES DE NAVEGAÇÃO READICIONADAS ---
+        
+        // Controle por Teclado (PC)
+        document.addEventListener('keydown', (e) => {
+            // Se o usuário estiver digitando no campo de busca, não muda de pokemon
+            if (document.activeElement.tagName === 'INPUT') return;
+            
+            if (e.key === 'ArrowRight') buscar(pkmAtualId + 1);
+            if (e.key === 'ArrowLeft' && pkmAtualId > 1) buscar(pkmAtualId - 1);
+        });
+
+        // Controle por Deslize (Mobile)
+        let touchstartX = 0;
+        let touchendX = 0;
+        const mainCard = document.getElementById('mainCard');
+
+        mainCard.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, false);
+
+        mainCard.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        }, false);
+
+        function handleGesture() {
+            const threshold = 70; // Sensibilidade do deslize
+            if (touchendX < touchstartX - threshold) {
+                // Deslizou para a esquerda -> Próximo
+                buscar(pkmAtualId + 1);
+            }
+            if (touchendX > touchstartX + threshold) {
+                // Deslizou para a direita -> Anterior
+                if (pkmAtualId > 1) buscar(pkmAtualId - 1);
+            }
+        }
     </script>
 </body>
 </html>
