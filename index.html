@@ -15,7 +15,7 @@
             --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #f0f0f0;
             --text-sub: #bbb; --bg-detalhes: rgba(40, 40, 40, 0.7);
             --menu-bg: #252525;
-        } 
+        }
 
         * { box-sizing: border-box; }
 
@@ -115,7 +115,19 @@
         .sugestao-item { padding: 10px 20px; cursor: pointer; text-transform: capitalize; }
         .sugestao-item:hover { background: var(--type-color); color: white; }
         
-        .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; width: 420px; max-width: 95vw; border-top: 10px solid var(--type-color); position: relative; transition: opacity 0.3s ease; }
+        .card { 
+            background: var(--bg-card); 
+            border-radius: 25px; 
+            padding: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            text-align: center; 
+            width: 420px; 
+            max-width: 95vw; 
+            border-top: 10px solid var(--type-color); 
+            position: relative; 
+            transition: opacity 0.3s ease;
+            touch-action: pan-y; /* Melhora o reconhecimento do swipe lateral */
+        }
         .card.loading { opacity: 0.3; }
         
         .btn-cry { background: var(--type-color); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8em; transition: 0.2s; }
@@ -231,6 +243,10 @@
         let pkmAtualNome = "";
         let audioChoro = null;
 
+        // Variáveis para o Swipe
+        let touchStartX = 0;
+        let touchEndX = 0;
+
         async function init() {
             const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
             const data = await res.json();
@@ -337,7 +353,6 @@
                 const resEv = await fetch(dataSp.evolution_chain.url);
                 const dataEv = await resEv.json();
 
-                // Função auxiliar para verificar se um Pokémon ou sua prole contém o Pokémon atual
                 function containsTarget(chain, targetName) {
                     if (chain.species.name === targetName) return true;
                     return chain.evolves_to.some(child => containsTarget(child, targetName));
@@ -359,7 +374,6 @@
                         else detalhes = det.trigger.name.replace(/-/g, ' ');
                     }
 
-                    // Se não for o primeiro da lista, coloca uma seta
                     const isFirst = chain === dataEv.chain;
 
                     html += `
@@ -374,11 +388,9 @@
                             </div>
                         </div>`;
 
-                    // Filtra os filhos: Se o alvo for o Eevee, mostra tudo. 
-                    // Se for o Vaporeon, mostra apenas o caminho que leva ao Vaporeon.
                     const relevantEvolutions = chain.evolves_to.filter(child => {
-                        if (pkmAtualNome === dataEv.chain.species.name) return true; // Se estiver no Eevee, mostra tudo
-                        return containsTarget(child, pkmAtualNome); // Se estiver em uma evolução, mostra só o caminho dela
+                        if (pkmAtualNome === dataEv.chain.species.name) return true;
+                        return containsTarget(child, pkmAtualNome);
                     });
 
                     relevantEvolutions.forEach(child => {
@@ -418,12 +430,41 @@
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
         function filtrarLista(v) { document.querySelectorAll('.mini-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(v.toLowerCase()) ? 'flex' : 'none'); }
 
+        // --- Lógica de Navegação (Teclado e Swipe) ---
+
+        // Função que processa o gesto detectado
+        function handleGesture() {
+            const threshold = 60; // Sensibilidade do deslize em pixels
+            if (touchEndX < touchStartX - threshold) {
+                // Deslizou para a esquerda (próximo)
+                buscar(pkmAtualId + 1);
+            }
+            if (touchEndX > touchStartX + threshold) {
+                // Deslizou para a direita (anterior)
+                if (pkmAtualId > 1) buscar(pkmAtualId - 1);
+            }
+        }
+
+        // Eventos para Teclado
         document.addEventListener('keydown', (e) => {
             if (document.activeElement.tagName === 'INPUT') return;
             if (e.key === 'ArrowRight') buscar(pkmAtualId + 1);
             if (e.key === 'ArrowLeft' && pkmAtualId > 1) buscar(pkmAtualId - 1);
         });
 
+        // Eventos para Touch (Swipe) no Card Principal
+        const cardElement = document.getElementById('mainCard');
+        
+        cardElement.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        cardElement.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleGesture();
+        }, { passive: true });
+
+        // Fechar dropdowns e menus ao clicar fora
         window.onclick = function(event) {
             if (!event.target.matches('.btn-more-tabs')) {
                 var dropdowns = document.getElementsByClassName("tab-dropdown");
@@ -438,4 +479,3 @@
     </script>
 </body>
 </html>
-
