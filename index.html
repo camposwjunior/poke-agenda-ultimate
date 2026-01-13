@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokéagenda Ultimate - 9 Gerações</title>
+    <title>Pokéagenda Ultimate - Pro Edition</title>
     <style>
         :root {
             --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333;
@@ -20,205 +20,227 @@
             background: var(--bg-body); color: var(--text-main); padding: 20px; transition: all 0.3s ease; 
         }
 
-        .btn-theme { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; background: none; border: none; }
-        .logo-pokemon { width: 100%; max-width: 250px; margin-bottom: 20px; }
+        .btn-theme { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; background: none; border: none; z-index: 10; }
+        .logo-pokemon { width: 100%; max-width: 250px; margin-bottom: 20px; cursor: pointer; }
         
-        .busca-container { margin-bottom: 15px; display: flex; gap: 10px; }
-        input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; width: 220px; outline: none; background: var(--bg-card); color: var(--text-main); }
-        button#btnBuscar { padding: 12px 25px; cursor: pointer; background: #e3350d; color: white; border: none; border-radius: 25px; font-weight: bold; }
-
-        /* BARRA DE FILTROS CENTRALIZADA E SEM SCROLL */
-        .filtros-wrapper { 
-            display: flex; 
-            flex-wrap: wrap; /* Permite quebrar linha */
-            justify-content: center; /* Centraliza os botões, inclusive os da segunda linha */
-            gap: 10px; 
-            width: 100%; 
-            max-width: 800px; 
-            margin-bottom: 25px; 
-        }
+        /* BUSCA E AUTO-COMPLETE */
+        .busca-container { margin-bottom: 15px; position: relative; display: flex; gap: 10px; width: 100%; max-width: 450px; justify-content: center; align-items: center; }
         
-        .btn-filtro { 
-            padding: 10px 15px; border-radius: 20px; border: 1px solid #ccc;
-            background: var(--bg-card); color: var(--text-main); cursor: pointer; font-size: 0.85em; 
-            font-weight: bold; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-width: 120px; /* Garante um tamanho uniforme */
-        }
-        .btn-filtro:hover { background: #e3350d; color: white; border-color: #e3350d; transform: translateY(-2px); }
+        input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; width: 100%; outline: none; background: var(--bg-card); color: var(--text-main); }
+        
+        .btn-home { background: #333; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .btn-home:hover { background: #e3350d; transform: scale(1.1); }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        #sugestoes {
+            position: absolute; top: 50px; left: 55px; width: 260px; background: var(--bg-card);
+            border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100;
+            max-height: 200px; overflow-y: auto; display: none; text-align: left;
+        }
+        .sugestao-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #44444422; font-size: 0.9em; font-weight: bold; }
+        .sugestao-item:hover { background: #e3350d; color: white; }
+
+        .filtros-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin-bottom: 25px; }
+        .btn-filtro { padding: 8px 12px; border-radius: 15px; border: 1px solid #ccc; background: var(--bg-card); color: var(--text-main); cursor: pointer; font-size: 0.8em; font-weight: bold; transition: 0.2s; }
+        .btn-filtro:hover { background: #e3350d; color: white; }
 
         .navegacao-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; max-width: 900px; }
-        .card { 
-            background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
-            text-align: center; width: 420px; animation: slideUp 0.6s ease-out; position: relative;
-        }
+        .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 420px; position: relative; }
 
-        .img-container { position: relative; }
-        img.pkm-img { width: 180px; height: 180px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
+        .btn-shiny { position: absolute; top: 120px; right: 50px; background: #ffe066; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px; z-index: 5; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
-        .btn-shiny {
-            position: absolute; bottom: 0; right: 40px; background: #ffe066; border: none; 
-            border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        .abas-container { display: flex; margin-top: 15px; gap: 5px; border-bottom: 2px solid #44444422; }
+        .tab-btn { flex: 1; padding: 10px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; transition: 0.3s; }
+        .tab-btn.active { color: #e3350d; border-bottom: 3px solid #e3350d; }
 
-        .detalhes { background: var(--bg-detalhes); border-radius: 20px; padding: 20px; text-align: left; margin-top: 10px; }
-        .badge-container { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
-        .badge { padding: 4px 10px; border-radius: 8px; font-size: 0.75em; color: white; font-weight: bold; text-transform: uppercase; }
+        .tab-content { display: none; padding: 15px 0; max-height: 350px; overflow-y: auto; text-align: left; }
+        .tab-content.active { display: block; }
 
-        .stats-container { margin-top: 15px; border-top: 1px solid #44444433; padding-top: 10px; }
-        .stat-row { display: flex; align-items: center; margin-bottom: 4px; font-size: 0.7em; font-weight: bold; }
-        .stat-label { width: 75px; color: var(--text-sub); }
-        .stat-bar-bg { flex-grow: 1; background: #ddd; height: 6px; border-radius: 3px; overflow: hidden; margin: 0 10px; }
-        .stat-bar-fill { height: 100%; transition: width 1s ease-in-out; }
+        .stat-row { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.75em; font-weight: bold; }
+        .stat-label { width: 70px; color: var(--text-sub); }
+        .stat-bar-bg { flex-grow: 1; background: #ddd; height: 8px; border-radius: 4px; overflow: hidden; margin: 0 10px; }
+        .stat-bar-fill { height: 100%; transition: width 0.8s ease; }
+
+        .move-row { display: flex; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #44444411; font-size: 0.8em; }
+        .move-lvl { color: #e3350d; font-weight: bold; }
+        .move-section-title { color: #e3350d; font-size: 0.9em; margin: 15px 0 8px 0; border-left: 4px solid #e3350d; padding-left: 8px; }
 
         .btn-nav { background: #333; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; transition: 0.2s; }
         .btn-nav:hover { background: #e3350d; }
-        .btn-choro { background: var(--btn-choro); color: white; border: none; border-radius: 12px; padding: 10px; width: 100%; cursor: pointer; font-weight: bold; margin: 10px 0; }
-        .descricao { font-size: 1.05em; line-height: 1.5; font-style: italic; margin-top: 15px; color: var(--text-main); }
+        .btn-choro { background: var(--btn-choro); color: white; border: none; border-radius: 12px; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin: 10px 0; font-size: 0.85em; }
     </style>
 </head>
 <body>
 
     <button class="btn-theme" onclick="toggleTheme()">🌓</button>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pokémon_logo.svg" id="logoIntro" class="logo-pokemon">
+    
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pokémon_logo.svg" class="logo-pokemon" id="logoIntro" onclick="voltarInicio()">
 
     <div class="busca-container">
-        <input type="text" id="pokemonInput" placeholder="Nome ou número">
+        <button class="btn-home" onclick="voltarInicio()" title="Voltar ao início">🏠</button>
+        
+        <input type="text" id="pokemonInput" placeholder="Nome ou número..." oninput="autoComplete(this.value)">
+        <div id="sugestoes"></div>
         <button id="btnBuscar" onclick="buscar()">Buscar</button>
     </div>
 
-    <div class="filtros-wrapper">
-        <button class="btn-filtro" onclick="filtrar(1)">1ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(152)">2ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(252)">3ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(387)">4ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(494)">5ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(650)">6ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(722)">7ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(810)">8ª Geração</button>
-        <button class="btn-filtro" onclick="filtrar(906)">9ª Geração</button>
-    </div>
+    <div class="filtros-wrapper" id="filtros"></div>
 
     <div class="navegacao-wrapper" id="areaResultado" style="display: none;">
         <button class="btn-nav" onclick="navegar(-1)"> < </button>
+        
         <div id="resultado" class="card">
-            <h2 id="pkmNome" style="margin-top:0"></h2>
-            <div class="img-container">
-                <img id="pkmImagem" class="pkm-img">
-                <button class="btn-shiny" onclick="toggleShiny()" title="Alternar Shiny">✨</button>
-            </div>
-            <div class="detalhes">
-                <p><strong>Tipo:</strong> <span id="pkmTipo"></span></p>
-                <p><strong>Forte contra:</strong></p>
-                <div id="containerForte" class="badge-container"></div>
-                <p><strong>Fraco contra:</strong></p>
-                <div id="containerFraco" class="badge-container"></div>
-                <button class="btn-choro" id="botaoAudio">🔊 OUVIR CHORO</button>
-                <div class="stats-container" id="statsContainer"></div>
-                <p class="descricao" id="pkmDescricao"></p>
+            <h2 id="pkmNome" style="margin-bottom: 5px;"></h2>
+            <button class="btn-shiny" onclick="toggleShiny()" title="Ver versão Shiny">✨</button>
+            <img id="pkmImagem" style="width: 180px; height: 180px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));">
+            
+            <div style="background: var(--bg-detalhes); border-radius: 20px; padding: 15px; margin-top: 10px;">
+                <div style="font-size: 0.9em; margin-bottom: 10px;">
+                    <strong>Tipo:</strong> <span id="pkmTipo"></span><br>
+                    <button class="btn-choro" id="botaoAudio">🔊 OUVIR CHORO</button>
+                </div>
+
+                <div class="abas-container">
+                    <button class="tab-btn active" onclick="openTab('tabSobre', this)">STATUS</button>
+                    <button class="tab-btn" onclick="openTab('tabMoves', this)">ATAQUES</button>
+                    <button class="tab-btn" onclick="openTab('tabTMs', this)">TMs / HMs</button>
+                </div>
+
+                <div id="tabSobre" class="tab-content active">
+                    <div id="statsContainer"></div>
+                    <p id="pkmDescricao" style="font-style: italic; font-size: 0.9em; margin-top: 12px; line-height: 1.4;"></p>
+                </div>
+
+                <div id="tabMoves" class="tab-content">
+                    <div id="movesList"></div>
+                </div>
+
+                <div id="tabTMs" class="tab-content">
+                    <div id="tmList"></div>
+                </div>
             </div>
         </div>
+
         <button class="btn-nav" onclick="navegar(1)"> > </button>
     </div>
 
     <script>
-        const traduzirTipo = {
-            fire: "Fogo", water: "Água", grass: "Planta", bug: "Inseto", normal: "Normal", poison: "Venenoso", 
-            electric: "Elétrico", ground: "Terra", fairy: "Fada", fighting: "Lutador", psychic: "Psíquico", 
-            rock: "Pedra", ghost: "Fantasma", ice: "Gelo", dragon: "Dragão", steel: "Aço", flying: "Voador", dark: "Sombrio"
-        };
+        const traduzirTipo = { fire: "Fogo", water: "Água", grass: "Planta", bug: "Inseto", normal: "Normal", poison: "Venenoso", electric: "Elétrico", ground: "Terra", fairy: "Fada", fighting: "Lutador", psychic: "Psíquico", rock: "Pedra", ghost: "Fantasma", ice: "Gelo", dragon: "Dragão", steel: "Aço", flying: "Voador", dark: "Sombrio" };
+        const coresTipos = { grass: "#78C850", fire: "#FF4422", water: "#6890F0", bug: "#A8B820", normal: "#A8A878", poison: "#A040A0", electric: "#F8D030", ground: "#B19149", fairy: "#EE99AC", fighting: "#C03028", psychic: "#F85888", rock: "#B8A038", ghost: "#705898", ice: "#98D8D8", dragon: "#7038F8", steel: "#B8B8D0", flying: "#A890F0", dark: "#705848" };
+        const traduzirStat = { 'hp': 'HP', 'attack': 'ATQ', 'defense': 'DEF', 'special-attack': 'S.ATQ', 'special-defense': 'S.DEF', 'speed': 'VEL' };
+        const hmsValidas = ["surf", "fly", "strength", "flash", "waterfall", "cut", "whirlpool", "rock-smash", "dive"];
 
-        const coresTipos = {
-            grass: "#78C850", fire: "#FF4422", water: "#6890F0", bug: "#A8B820", normal: "#A8A878", 
-            poison: "#A040A0", electric: "#F8D030", ground: "#B19149", fairy: "#EE99AC", fighting: "#C03028", 
-            psychic: "#F85888", rock: "#B8A038", ghost: "#705898", ice: "#98D8D8", dragon: "#7038F8", 
-            steel: "#B8B8D0", flying: "#A890F0", dark: "#705848"
-        };
+        let idAtual = 0, imgNormal = "", imgShiny = "", mostrandoShiny = false, listaNomes = [];
 
-        let idAtual = 0, imgNormal = "", imgShiny = "", mostrandoShiny = false;
+        // FUNÇÃO DE VOLTAR AO INÍCIO
+        function voltarInicio() {
+            idAtual = 0;
+            document.getElementById('pokemonInput').value = '';
+            document.getElementById('sugestoes').style.display = 'none';
+            document.getElementById('areaResultado').style.display = 'none';
+            document.getElementById('logoIntro').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function carregarLista() {
+            try {
+                const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+                const dados = await res.json();
+                listaNomes = dados.results.map(p => p.name);
+                
+                const geracoes = [
+                    {n: "1ª", id: 1}, {n: "2ª", id: 152}, {n: "3ª", id: 252}, {n: "4ª", id: 387}, 
+                    {n: "5ª", id: 494}, {n: "6ª", id: 650}, {n: "7ª", id: 722}, {n: "8ª", id: 810}, {n: "9ª", id: 906}
+                ];
+                const divF = document.getElementById('filtros');
+                geracoes.forEach(g => {
+                    divF.innerHTML += `<button class="btn-filtro" onclick="filtrar(${g.id})">${g.n} Gen</button>`;
+                });
+            } catch (e) { console.error("Erro ao carregar", e); }
+        }
+        carregarLista();
+
+        function autoComplete(valor) {
+            const listaDiv = document.getElementById('sugestoes');
+            if (!valor || valor.length < 2) { listaDiv.style.display = 'none'; return; }
+            const filtro = listaNomes.filter(n => n.includes(valor.toLowerCase())).slice(0, 6);
+            if (filtro.length > 0) {
+                listaDiv.innerHTML = filtro.map(n => `<div class="sugestao-item" onclick="filtrar('${n}')">${n.toUpperCase()}</div>`).join('');
+                listaDiv.style.display = 'block';
+            } else { listaDiv.style.display = 'none'; }
+        }
+
+        function openTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
 
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-        function toggleShiny() {
-            mostrandoShiny = !mostrandoShiny;
-            document.getElementById('pkmImagem').src = mostrandoShiny ? imgShiny : imgNormal;
-        }
-
-        function filtrar(valor) {
-            document.getElementById('pokemonInput').value = valor;
-            buscar();
-        }
-
-        function navegar(dir) {
-            const novoId = idAtual + dir;
-            if (novoId > 0) { filtrar(novoId); }
-        }
+        function toggleShiny() { mostrandoShiny = !mostrandoShiny; document.getElementById('pkmImagem').src = mostrandoShiny ? imgShiny : imgNormal; }
+        function filtrar(v) { document.getElementById('pokemonInput').value = v; document.getElementById('sugestoes').style.display = 'none'; buscar(); }
+        function navegar(dir) { const nid = idAtual + dir; if (nid > 0) filtrar(nid); }
 
         async function buscar() {
-            const btn = document.getElementById('btnBuscar');
+            const btnBusca = document.getElementById('btnBuscar');
             const valor = document.getElementById('pokemonInput').value.toLowerCase().trim();
             if (!valor) return;
-            btn.innerText = "..."; btn.disabled = true;
+            btnBusca.innerText = "...";
 
             try {
                 const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${valor}`);
                 const dados = await res.json();
                 idAtual = dados.id;
                 mostrandoShiny = false;
-
                 imgNormal = dados.sprites.other['official-artwork'].front_default;
                 imgShiny = dados.sprites.other['official-artwork'].front_shiny || imgNormal;
 
-                let fortes = new Set(), fracos = new Set();
-                for (const t of dados.types) {
-                    const resT = await fetch(t.type.url);
-                    const d = await resT.json();
-                    d.damage_relations.double_damage_to.forEach(i => fortes.add(i.name));
-                    d.damage_relations.double_damage_from.forEach(i => fracos.add(i.name));
-                }
-
-                const renderBadges = (set, id) => {
-                    const c = document.getElementById(id); c.innerHTML = '';
-                    set.forEach(t => {
-                        const s = document.createElement('span'); s.className = 'badge';
-                        s.innerText = traduzirTipo[t] || t; s.style.backgroundColor = coresTipos[t] || '#999';
-                        c.appendChild(s);
-                    });
-                };
-                renderBadges(fortes, 'containerForte'); renderBadges(fracos, 'containerFraco');
-
-                const resS = await fetch(dados.species.url);
-                const dS = await resS.json();
-                let txt = dS.flavor_text_entries.find(e => e.language.name === 'en').flavor_text;
-                txt = txt.replace(/[\f\n\r]/g, ' ').replace(/-\s/g, '').replace(/\s+/g, ' ');
-                const resTr = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(txt)}&langpair=en|pt-br`);
-                const dTr = await resTr.json();
-
                 document.getElementById('logoIntro').style.display = 'none';
-                const area = document.getElementById('areaResultado');
-                area.style.display = 'none';
-                setTimeout(() => { area.style.display = 'flex'; }, 10);
-
+                document.getElementById('areaResultado').style.display = 'flex';
                 document.getElementById('pkmNome').innerText = `#${dados.id} - ${dados.name.toUpperCase()}`;
                 document.getElementById('pkmImagem').src = imgNormal;
                 document.getElementById('pkmTipo').innerText = dados.types.map(t => traduzirTipo[t.type.name] || t.type.name).join(' / ');
-                document.getElementById('pkmDescricao').innerText = dTr.responseData.translatedText;
+                document.getElementById('botaoAudio').onclick = () => { new Audio(dados.cries.latest).play(); };
+
+                const cor = coresTipos[dados.types[0].type.name] || "#ccc";
+                document.getElementById('resultado').style.backgroundColor = document.body.classList.contains('dark-mode') ? cor + "44" : cor + "22";
 
                 const statsC = document.getElementById('statsContainer'); statsC.innerHTML = '';
                 dados.stats.forEach(s => {
                     const v = s.base_stat;
                     const c = v > 100 ? '#2ecc71' : (v > 60 ? '#f1c40f' : '#e74c3c');
-                    statsC.innerHTML += `<div class="stat-row"><span class="stat-label">${s.stat.name.toUpperCase().replace('SPECIAL-', 'S.')}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(v/255)*100}%; background: ${c}"></div></div><span>${v}</span></div>`;
+                    statsC.innerHTML += `<div class="stat-row"><span class="stat-label">${traduzirStat[s.stat.name]}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(v/255)*100}%; background: ${c}"></div></div><span>${v}</span></div>`;
                 });
 
-                document.getElementById('botaoAudio').onclick = () => { new Audio(dados.cries.latest).play(); };
-                const corOriginal = coresTipos[dados.types[0].type.name] || "#ccc";
-                document.getElementById('resultado').style.backgroundColor = document.body.classList.contains('dark-mode') ? corOriginal + "44" : corOriginal + "22";
+                const resS = await fetch(dados.species.url);
+                const dS = await resS.json();
+                let txt = (dS.flavor_text_entries.find(e => e.language.name === 'en') || dS.flavor_text_entries[0]).flavor_text.replace(/[\f\n\r]/g, ' ');
+                const resTr = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(txt)}&langpair=en|pt-br`);
+                const dTr = await resTr.json();
+                document.getElementById('pkmDescricao').innerText = dTr.responseData.translatedText;
 
-            } catch (e) { alert("Pokémon não encontrado!"); }
-            finally { btn.innerText = "Buscar"; btn.disabled = false; }
+                document.getElementById('movesList').innerHTML = dados.moves
+                    .filter(m => m.version_group_details[0].move_learn_method.name === 'level-up')
+                    .sort((a,b) => a.version_group_details[0].level_learned_at - b.version_group_details[0].level_learned_at)
+                    .map(m => `<div class="move-row"><span>${m.move.name.toUpperCase().replace('-',' ')}</span><span class="move-lvl">Lv ${m.version_group_details[0].level_learned_at}</span></div>`)
+                    .join('');
+
+                const machines = dados.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'machine');
+                let hms = [], tms = [];
+                machines.forEach(m => {
+                    const n = m.move.name;
+                    hmsValidas.includes(n) ? hms.push(n.toUpperCase().replace('-',' ')) : tms.push(n.toUpperCase().replace('-',' '));
+                });
+
+                let htmlTM = `<div class="move-section-title">HMs (Campo)</div>`;
+                htmlTM += hms.length ? hms.map(h => `<div class="move-row"><span>${h}</span><span>🌊</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Nenhuma HM.</p>`;
+                htmlTM += `<div class="move-section-title">TMs (Ataque)</div>`;
+                htmlTM += tms.length ? tms.map(t => `<div class="move-row"><span>${t}</span><span>💿</span></div>`).join('') : `<p style="font-size:0.8em; padding-left:10px;">Nenhuma TM.</p>`;
+                document.getElementById('tmList').innerHTML = htmlTM;
+
+            } catch (e) { alert("Erro ao buscar."); }
+            finally { btnBusca.innerText = "Buscar"; }
         }
     </script>
 </body>
-
-</html> 
+</html>
