@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokéagenda Ultimate - Cross Platform</title>
+    <title>Pokéagenda Ultimate</title>
     <style>
         :root {
             --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333;
@@ -19,37 +19,42 @@
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; transition: 0.3s; overflow-x: hidden; }
         
-        /* MENU */
-        .menu-icon { position: fixed; top: 20px; left: 20px; font-size: 30px; cursor: pointer; z-index: 1200; background: var(--bg-card); border-radius: 8px; padding: 5px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--menu-bg); z-index: 1100; transition: 0.4s; box-shadow: 5px 0 15px rgba(0,0,0,0.2); padding: 80px 20px 20px; display: flex; flex-direction: column; gap: 15px; }
+        /* MENU LATERAL TOTALMENTE OCULTO */
+        .menu-icon { position: fixed; top: 20px; left: 20px; font-size: 28px; cursor: pointer; z-index: 1200; background: var(--bg-card); border-radius: 8px; padding: 5px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        .side-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: var(--menu-bg); z-index: 1300; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 20px rgba(0,0,0,0.3); padding: 80px 20px 20px; display: flex; flex-direction: column; gap: 15px; }
         .side-menu.open { left: 0; }
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1080; }
-        .menu-item { padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1250; backdrop-filter: blur(2px); }
+        .menu-item { padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; border-bottom: 1px solid #44444411; }
         .menu-item:hover { background: var(--type-color); color: white; }
 
-        /* BUSCA */
-        .logo-pokemon { width: 100%; max-width: 220px; margin-bottom: 20px; cursor: pointer; }
-        .busca-container { display: flex; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px; }
-        input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; flex: 1; background: var(--bg-card); color: var(--text-main); outline: none; }
-        button#btnBuscar { background: #333; color: white; border: none; border-radius: 25px; padding: 10px 25px; cursor: pointer; font-weight: bold; }
+        /* BUSCA E AUTOCOMPLETE */
+        .logo-pokemon { width: 100%; max-width: 180px; margin-bottom: 15px; cursor: pointer; }
+        .busca-wrapper { position: relative; width: 100%; max-width: 500px; display: flex; gap: 8px; margin-bottom: 20px; }
+        input { padding: 12px 20px; border-radius: 25px; border: 2px solid #ccc; flex: 1; background: var(--bg-card); color: var(--text-main); outline: none; font-size: 16px; }
+        button#btnBuscar { background: #333; color: white; border: none; border-radius: 25px; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; max-height: 250px; overflow-y: auto; display: none; margin-top: 5px; border: 1px solid #ddd; }
+        .autocomplete-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #eee; text-transform: capitalize; font-size: 0.9em; }
+        .autocomplete-item:hover { background: var(--type-color); color: white; }
 
         /* CARD PRINCIPAL */
-        .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; width: 420px; max-width: 95vw; border-top: 10px solid var(--type-color); position: relative; transition: opacity 0.3s ease, transform 0.3s ease; }
-        .card.loading { opacity: 0.3; transform: scale(0.98); }
+        .card { background: var(--bg-card); border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; width: 420px; max-width: 95vw; border-top: 10px solid var(--type-color); position: relative; transition: opacity 0.3s ease; }
+        .card.loading { opacity: 0.3; }
         
         .abas-container { display: flex; margin-top: 15px; border-bottom: 2px solid #44444422; overflow-x: auto; scrollbar-width: none; }
         .tab-btn { padding: 10px 15px; background: none; border: none; color: var(--text-sub); cursor: pointer; font-weight: bold; font-size: 0.75em; flex-shrink: 0; }
         .tab-btn.active { color: var(--type-color); border-bottom: 3px solid var(--type-color); }
-        
         .tab-content { display: none; padding: 15px 0; max-height: 320px; overflow-y: auto; text-align: left; }
         .tab-content.active { display: block; }
+
+        /* ESTILOS INTERNOS */
         .section-title { font-size: 0.9em; font-weight: bold; color: var(--type-color); margin: 15px 0 5px 0; border-bottom: 1px solid var(--type-color); padding-bottom: 3px; }
         .item-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #44444411; font-size: 0.85em; align-items: center; }
         .ability-box { background: rgba(0,0,0,0.05); padding: 12px; border-radius: 12px; border-left: 5px solid var(--type-color); margin-bottom: 10px; }
-        
-        /* MODAL E GRID */
+
+        /* MODAL */
         .grid-pokemon { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; overflow-y: auto; padding: 10px; }
-        .mini-card { background: var(--bg-card); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .mini-card { background: var(--bg-card); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: var(--bg-body); width: 95%; max-width: 850px; height: 85vh; border-radius: 25px; padding: 20px; display: flex; flex-direction: column; position: relative; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--accent); }
@@ -68,16 +73,17 @@
 
     <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pokémon_logo.svg" class="logo-pokemon" id="logoIntro" onclick="voltarInicio()">
 
-    <div class="busca-container">
-        <input type="text" id="pkmInput" placeholder="Nome ou número... (Enter para buscar)">
+    <div class="busca-wrapper">
+        <input type="text" id="pkmInput" placeholder="Nome ou número..." autocomplete="off" oninput="showSuggestions(this.value)">
         <button id="btnBuscar" onclick="buscar()">Buscar</button>
+        <div id="autocompleteList" class="autocomplete-list"></div>
     </div>
 
     <div id="areaResultado" style="display: none;">
         <div class="card" id="mainCard">
             <h2 id="pkmNome" style="margin: 0 0 10px 0;"></h2>
-            <img id="pkmImg" style="width:180px; height: 180px; object-fit: contain;">
-            <p id="pkmTipos" style="font-weight: bold; margin-bottom: 10px;"></p>
+            <img id="pkmImg" style="width:160px; height: 160px; object-fit: contain;">
+            <p id="pkmTipos" style="font-weight: bold; margin-bottom: 10px; font-size: 0.9em;"></p>
             
             <div style="background: var(--bg-detalhes); border-radius: 20px; padding: 15px;">
                 <div class="abas-container">
@@ -91,7 +97,7 @@
                 <div id="tabAtk" class="tab-content"></div>
                 <div id="tabTM" class="tab-content"></div>
             </div>
-            <small style="color: var(--text-sub); display: block; margin-top: 15px;">Dica: Use as setas ← → do teclado</small>
+            <small style="color: var(--text-sub); display: block; margin-top: 10px;">← Deslize ou use as setas ← →</small>
         </div>
     </div>
 
@@ -99,69 +105,52 @@
         <div class="modal-content">
             <span class="close-modal" onclick="fecharLista()">&times;</span>
             <h2 style="text-align:center">Pokédex Nacional</h2>
-            <input type="text" placeholder="Filtrar..." oninput="filtrarLista(this.value)" style="margin-bottom:15px; width: 100%;">
+            <input type="text" placeholder="Filtrar..." oninput="filtrarLista(this.value)">
             <div id="gridPkm" class="grid-pokemon"></div>
         </div>
     </div>
 
     <script>
         const colors = { fire: '#ff9c54', grass: '#63bb5b', water: '#4e90d5', bug: '#90c12c', normal: '#9099a1', poison: '#ab6ac8', electric: '#f3d23b', ground: '#d97746', fairy: '#ee99ac', fighting: '#ce4069', psychic: '#f97176', rock: '#c7b78b', ghost: '#5269ac', ice: '#74ced9', dragon: '#0a6af2', dark: '#5a5366', steel: '#5a8ea1', flying: '#8fa8dd' };
-        let listaCompleta = [];
+        let listaNomes = [];
         let pkmAtualId = 1;
-        
-        // --- NAVEGAÇÃO POR TECLADO ---
-        document.addEventListener('keydown', (e) => {
-            if (document.getElementById('areaResultado').style.display === 'block' && document.activeElement.tagName !== 'INPUT') {
-                if (e.key === 'ArrowRight') nextPkm();
-                if (e.key === 'ArrowLeft') prevPkm();
-            }
-            if (e.key === 'Enter' && document.activeElement.id === 'pkmInput') buscar();
-        });
-
-        // --- NAVEGAÇÃO POR SWIPE/MOUSE ---
-        let touchstartX = 0;
-        let touchendX = 0;
-        const mainCard = document.getElementById('mainCard');
-        
-        mainCard.addEventListener('touchstart', e => touchstartX = e.changedTouches[0].screenX);
-        mainCard.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleSwipe(); });
-        mainCard.addEventListener('mousedown', e => touchstartX = e.screenX);
-        mainCard.addEventListener('mouseup', e => { touchendX = e.screenX; handleSwipe(); });
-
-        function handleSwipe() {
-            const threshold = 70;
-            if (touchendX < touchstartX - threshold) nextPkm();
-            if (touchendX > touchstartX + threshold) prevPkm();
-        }
 
         async function init() {
             const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
             const data = await res.json();
-            listaCompleta = data.results.map(p => p.name);
+            listaNomes = data.results.map(p => p.name);
         }
         init();
 
-        async function traduzir(txt) {
-            if(!txt) return "Sem descrição.";
-            try {
-                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(txt.replace(/\n/g, ' '))}&langpair=en|pt-br`);
-                const json = await res.json();
-                return json.responseData.translatedText;
-            } catch { return txt; }
+        // --- AUTOCOMPLETE ---
+        function showSuggestions(val) {
+            const list = document.getElementById('autocompleteList');
+            if (!val) { list.style.display = 'none'; return; }
+            const filtered = listaNomes.filter(n => n.startsWith(val.toLowerCase())).slice(0, 10);
+            if (filtered.length > 0) {
+                list.innerHTML = filtered.map(n => `<div class="autocomplete-item" onclick="selSuggestion('${n}')">${n}</div>`).join('');
+                list.style.display = 'block';
+            } else { list.style.display = 'none'; }
+        }
+        function selSuggestion(n) {
+            document.getElementById('pkmInput').value = n;
+            document.getElementById('autocompleteList').style.display = 'none';
+            buscar(n);
         }
 
+        // --- BUSCA E NAVEGAÇÃO ---
         async function buscar(idOuNome) {
             const query = idOuNome || document.getElementById('pkmInput').value.toLowerCase().trim();
             if(!query) return;
-
+            document.getElementById('autocompleteList').style.display = 'none';
             const card = document.getElementById('mainCard');
-            card.classList.add('loading'); // Inicia animação de troca
+            card.classList.add('loading');
 
             try {
                 const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${query}`);
                 const d = await res.json();
                 pkmAtualId = d.id;
-
+                
                 const type = d.types[0].type.name;
                 document.documentElement.style.setProperty('--type-color', colors[type] || '#e3350d');
 
@@ -171,71 +160,57 @@
                 document.getElementById('pkmImg').src = d.sprites.other['official-artwork'].front_default;
                 document.getElementById('pkmTipos').innerText = d.types.map(t => t.type.name.toUpperCase()).join(' / ');
 
-                // Stats
+                // Renderiza Status
                 document.getElementById('tabStats').innerHTML = d.stats.map(s => `
                     <div style="display:flex; align-items:center; margin-bottom:10px; font-size:0.85em">
                         <span style="width:90px; font-weight:bold">${s.stat.name.toUpperCase()}</span>
                         <div style="flex:1; background:#ddd; height:8px; border-radius:4px; margin:0 10px; overflow:hidden">
-                            <div style="width:${(s.base_stat/255)*100}%; background:var(--type-color); height:100%"></div>
+                            <div style="width:${Math.min((s.base_stat/200)*100, 100)}%; background:var(--type-color); height:100%"></div>
                         </div>
                         <span>${s.base_stat}</span>
                     </div>`).join('');
 
-                // Habilidades
-                document.getElementById('tabAbil').innerHTML = "Carregando...";
-                const abilHTML = await Promise.all(d.abilities.map(async a => {
-                    const rAb = await fetch(a.ability.url);
-                    const dAb = await rAb.json();
-                    const enDesc = dAb.effect_entries.find(e => e.language.name === 'en')?.short_effect;
-                    const ptDesc = await traduzir(enDesc);
-                    return `<div class="ability-box"><strong style="color:var(--type-color)">${a.ability.name.toUpperCase()}</strong><div>${ptDesc}</div></div>`;
-                }));
-                document.getElementById('tabAbil').innerHTML = abilHTML.join('');
-
-                // Ataques
+                // Ataques e TM/HM (Simplificado para performance)
                 const lvAtks = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'level-up').sort((a,b) => a.version_group_details[0].level_learned_at - b.version_group_details[0].level_learned_at);
                 document.getElementById('tabAtk').innerHTML = lvAtks.map(m => `<div class="item-row"><span>${m.move.name.toUpperCase()}</span><span style="color:var(--type-color)">Lv ${m.version_group_details[0].level_learned_at}</span></div>`).join('');
 
                 // HM/TM
-                document.getElementById('tabTM').innerHTML = "Buscando...";
-                const machineMoves = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'machine');
-                const tmsRaw = await Promise.all(machineMoves.map(async m => {
-                    const rM = await fetch(m.move.url); const dM = await rM.json();
-                    const machine = dM.machines[dM.machines.length - 1];
-                    if(machine) {
-                        const rMac = await fetch(machine.machine.url); const dMac = await rMac.json();
-                        const label = dMac.item.name.toUpperCase();
-                        return { label, name: m.move.name.toUpperCase(), num: parseInt(label.replace(/\D/g,'')) };
-                    } return null;
-                }));
-
-                const uniqueTMs = []; const labelsUsed = new Set();
-                tmsRaw.filter(x => x).forEach(item => {
-                    if(!labelsUsed.has(item.label)) { labelsUsed.add(item.label); uniqueTMs.push(item); }
-                });
-
-                const hms = uniqueTMs.filter(x => x.label.startsWith('HM')).sort((a,b) => a.num - b.num);
-                const tms = uniqueTMs.filter(x => x.label.startsWith('TM')).sort((a,b) => a.num - b.num);
-
-                let tmHTML = `<div class="section-title">HM:</div>` + (hms.length ? hms.map(h => `<div class="item-row"><span>${h.label} - ${h.name}</span><span>💿</span></div>`).join('') : "Nenhuma");
-                tmHTML += `<div class="section-title">TM:</div>` + (tms.length ? tms.map(t => `<div class="item-row"><span>${t.label} - ${t.name}</span><span>💿</span></div>`).join('') : "Nenhuma");
-                document.getElementById('tabTM').innerHTML = tmHTML;
+                const machines = d.moves.filter(m => m.version_group_details[0].move_learn_method.name === 'machine');
+                document.getElementById('tabTM').innerHTML = machines.slice(0,20).map(m => `<div class="item-row"><span>${m.move.name.toUpperCase()}</span><span>💿</span></div>`).join('') + `<p style="font-size:0.7em; text-align:center">Mostrando principais...</p>`;
 
             } catch(e) { console.error(e); }
-            setTimeout(() => card.classList.remove('loading'), 100); // Remove animação após carregar
+            card.classList.remove('loading');
         }
 
-        function nextPkm() { buscar(pkmAtualId + 1); }
-        function prevPkm() { if(pkmAtualId > 1) buscar(pkmAtualId - 1); }
+        // --- SWIPE / TECLADO ---
+        let touchstartX = 0; let touchendX = 0;
+        const mainCard = document.getElementById('mainCard');
+        mainCard.addEventListener('touchstart', e => touchstartX = e.changedTouches[0].screenX);
+        mainCard.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; if (touchendX < touchstartX - 70) buscar(pkmAtualId + 1); if (touchendX > touchstartX + 70 && pkmAtualId > 1) buscar(pkmAtualId - 1); });
+        
+        document.addEventListener('keydown', e => {
+            if (document.activeElement.tagName === 'INPUT') return;
+            if (e.key === 'ArrowRight') buscar(pkmAtualId + 1);
+            if (e.key === 'ArrowLeft' && pkmAtualId > 1) buscar(pkmAtualId - 1);
+        });
 
-        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); document.getElementById('menuOverlay').style.display = document.getElementById('sideMenu').classList.contains('open') ? 'block' : 'none'; }
-        function openTab(id, btn) { document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
-        function abrirLista() { document.getElementById('modalLista').style.display = 'flex'; const g = document.getElementById('gridPkm'); if(!g.innerHTML) g.innerHTML = listaCompleta.map((n, i) => `<div class="mini-card" onclick="selPkm('${n}')"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png" loading="lazy"><span class="pkm-id">#${i+1}</span><span class="pkm-name">${n}</span></div>`).join(''); }
-        function selPkm(n) { buscar(n); fecharLista(); }
+        // --- MENU E MODAL ---
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+            menu.classList.toggle('open');
+            overlay.style.display = menu.classList.contains('open') ? 'block' : 'none';
+        }
+        function openTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+        function abrirLista() { document.getElementById('modalLista').style.display = 'flex'; }
         function fecharLista() { document.getElementById('modalLista').style.display = 'none'; }
         function voltarInicio() { document.getElementById('areaResultado').style.display='none'; document.getElementById('logoIntro').style.display='block'; }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-        function filtrarLista(v) { document.querySelectorAll('.mini-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(v.toLowerCase()) ? 'flex' : 'none'); }
     </script>
 </body>
 </html>
